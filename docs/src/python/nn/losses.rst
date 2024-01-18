@@ -9,6 +9,7 @@ Loss Functions
    :toctree: _autosummary_functions
    :template: nn-module-template.rst
 
+   mape_loss
    binary_cross_entropy
    cosine_similarity_loss
    cross_entropy

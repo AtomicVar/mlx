@@ -148,6 +148,51 @@ def mse_loss(
     return _reduce(loss, reduction)
 
 
+def mape_loss(
+    predictions: mx.array,
+    targets: mx.array,
+    reduction: str = "mean",
+    epsilon: float = 1e-15,
+) -> float:
+    """
+    Calculate the mean absolute percentage error (MAPE) between predictions and targets.
+
+    Args:
+        predictions (array): The predicted values.
+        targets (array): The target values.
+        reduction (str, optional): Specifies the reduction to apply to the output:
+          ``'none'`` | ``'mean'`` | ``'sum'``. Default: ``'mean'``.
+        epsilon (float, optional): Small constant to avoid numerical instability.
+
+    Returns:
+        array: The computed mean absolute percentage error loss.
+
+    Examples:
+    >>> targets = mx.array([10, 20, 30, 40])
+    >>> predictions = mx.array([12, 18, 33, 45])
+    >>> loss = nn.losses.mape_loss(predictions, targets, "mean")
+    >>> loss
+    array([0.13125], dtype=float32)
+
+    >>> targets = mx.array([1, 2, 3, 4])
+    >>> predictions = mx.array([2, 3, 4, 5])
+    >>> loss = nn.losses.mape_loss(predictions, targets, "mean")
+    array([0.5208333333333333], dtype=float32)
+
+    """
+    # inputs shape must be same as targets shape
+    if predictions.shape != targets.shape:
+        raise ValueError(
+            f"Predictions shape {predictions.shape} does not match targets shape {targets.shape}."
+        )
+
+    # replace 0s in targets with epsilon
+    targets = mx.where(targets == 0, epsilon, targets)
+    absolute_percentage_diff = mx.abs((targets - predictions) / targets)
+
+    return _reduce(absolute_percentage_diff, reduction)
+
+
 def nll_loss(
     inputs: mx.array, targets: mx.array, axis: int = -1, reduction: str = "none"
 ) -> mx.array:
